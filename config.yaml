@@ -1,0 +1,90 @@
+# Smart Garden System Configuration
+
+# System settings
+system:
+  name: "Smart Garden System"
+  log_level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  data_dir: "data"   # Directory for storing data files
+
+# Hardware configuration
+hardware:
+  # Soil moisture sensor
+  soil_moisture:
+    pin: 17           # GPIO pin number
+    read_interval: 300  # Seconds between readings
+    dry_value: 800      # Sensor value when completely dry
+    wet_value: 300      # Sensor value when in water
+    
+  # BME280 sensor (temperature, humidity, pressure)
+  bme280:
+    i2c_address: "0x76"  # I2C address of the sensor
+    read_interval: 300   # Seconds between readings
+    
+  # Water pump/valve
+  pump:
+    pin: 18             # GPIO pin number
+    active_low: false   # Set to true if relay is triggered by LOW signal
+    
+  # Camera
+  camera:
+    enabled: true
+    resolution: [1280, 720]
+    capture_interval: 3600  # Seconds between captures
+    
+# Watering settings
+watering:
+  threshold: 30         # Moisture percentage below which to water
+  duration: 10          # Seconds to run the pump
+  cooldown: 3600        # Seconds to wait between watering cycles
+  weather_aware: true   # Adjust watering based on weather forecast
+  
+# Weather API
+weather_api:
+  provider: "openweathermap"  # Options: openweathermap, weatherapi, etc.
+  api_key: ""                 # Your API key (REQUIRED for real operation)
+  location: "Volos,Greece"    # Location set to Volos, Greece
+  update_interval: 3600       # Seconds between weather updates
+  
+# Database settings
+database:
+  type: "sqlite"        # Options: sqlite, postgresql
+  path: "data/garden.db"  # Path for SQLite database
+  # PostgreSQL settings (only used if type is postgresql)
+  host: "localhost"
+  port: 5432
+  name: "garden"
+  user: ""              # Database username (if using PostgreSQL)
+  password: ""          # Database password (if using PostgreSQL)
+  
+# Notification settings
+notifications:
+  # Telegram notifications
+  telegram:
+    enabled: true
+    bot_token: ""       # Your Telegram bot token (REQUIRED if enabled)
+    chat_id: ""         # Your Telegram chat ID (REQUIRED if enabled)
+    
+  # Alert thresholds
+  alerts:
+    low_moisture: 20    # Alert when moisture below this percentage
+    high_temperature: 30  # Alert when temperature above this value (°C)
+    low_temperature: 5    # Alert when temperature below this value (°C)
+    
+# Web interface
+web_interface:
+  enabled: true
+  host: "0.0.0.0"       # Listen on all interfaces
+  port: 12000           # Port to run the web server on
+  debug: false          # Enable Flask debug mode
+  
+# Machine learning
+ml:
+  enabled: true
+  model_dir: "models"   # Directory for storing ML models
+  training_interval: 86400  # Seconds between model retraining (1 day)
+  
+# Logging
+logging:
+  file: "logs/garden.log"
+  max_size: 10          # Maximum log file size in MB
+  backup_count: 5       # Number of backup log files to keep
