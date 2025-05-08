@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple demo script for the Smart Garden System.
-Runs the system with simulated hardware for demonstration purposes.
+Run script for the Smart Garden System.
 """
 
 import os
@@ -23,8 +22,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def main():
-    """Run the Smart Garden System in demo mode."""
-    logger.info("Starting Smart Garden System Demo")
+    """Run the Smart Garden System."""
+    logger.info("Starting Smart Garden System")
     
     # Create data directory if it doesn't exist
     os.makedirs('data', exist_ok=True)
@@ -46,11 +45,11 @@ def main():
     system_thread.daemon = True
     system_thread.start()
     
-    # Print information about the demo
+    # Print information about the system
     print("\n" + "="*80)
-    print("Smart Garden System Demo")
+    print("Smart Garden System")
     print("="*80)
-    print("\nThe system is now running with simulated hardware.")
+    print("\nThe system is now running.")
     print("Web interface available at: http://localhost:12000")
     print("\nPress Ctrl+C to exit.")
     print("="*80 + "\n")
@@ -62,7 +61,7 @@ def main():
     except KeyboardInterrupt:
         logger.info("Keyboard interrupt received, shutting down")
     finally:
-        logger.info("Demo completed")
+        logger.info("System stopped")
 
 if __name__ == "__main__":
     main()

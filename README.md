@@ -29,29 +29,12 @@ An intelligent watering and plant monitoring system powered by Raspberry Pi and 
 - Flask web interface with interactive dashboard
 - OpenWeatherMap API integration
 - Telegram notifications
-- Mock implementations for development without hardware
 
 ## Installation
 
-### For Development/Demo (No Hardware Required)
-
 ```bash
 # Clone the repository
-git clone https://github.com/YourUsername/smart-garden-system.git
-cd smart-garden-system
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run in demo mode (no hardware required)
-python run_simple_demo.py
-```
-
-### For Production (With Hardware)
-
-```bash
-# Clone the repository
-git clone https://github.com/YourUsername/smart-garden-system.git
+git clone https://github.com/DimitrisZografos/smart-garden-system.git
 cd smart-garden-system
 
 # Install dependencies
@@ -69,7 +52,7 @@ python src/setup.py
 # - Set up Telegram notification settings
 
 # Run the system
-python src/main.py
+python run.py
 ```
 
 ## Configuration
@@ -81,21 +64,9 @@ Edit the `config.yaml` file to set up your:
 - Database settings
 - Telegram notification settings
 
-## Demo Mode
+## Required Sensitive Information
 
-The system includes a demo mode that simulates sensor readings and system functionality without requiring physical hardware. This is useful for development, testing, and demonstration purposes.
-
-To run in demo mode:
-
-```bash
-python run_simple_demo.py
-```
-
-This will start a web server with mock data that you can access at http://localhost:12000.
-
-## Required Sensitive Information for Production Use
-
-When deploying this system for real use (not demo mode), you'll need to provide the following sensitive information in your `config.yaml` file:
+You'll need to provide the following sensitive information in your `config.yaml` file:
 
 1. **Weather API Key**: 
    - Sign up for an API key from OpenWeatherMap
