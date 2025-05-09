@@ -1,0 +1,55 @@
+# Smart Garden System Configuration Example
+# Created by: Dimitris Zografos
+# Date: May 2025
+
+# System settings
+system:
+  log_level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR
+  check_interval: 300  # Seconds between sensor readings (5 minutes)
+
+# Hardware settings
+hardware:
+  # Soil moisture sensor
+  soil_moisture:
+    pin: 17  # GPIO pin number
+    threshold: 30  # Percentage below which to trigger watering
+
+  # Water pump relay
+  pump:
+    pin: 18  # GPIO pin number
+    duration: 10  # Seconds to run the pump when watering
+
+  # BME280 sensor (temperature, humidity, pressure)
+  bme280:
+    enabled: true
+    i2c_address: 0x76  # Default I2C address
+
+  # Camera
+  camera:
+    enabled: true
+    resolution: [1280, 720]  # Width, height
+    rotation: 0  # Degrees (0, 90, 180, 270)
+
+# Weather API settings
+weather:
+  provider: "openweathermap"
+  api_key: ""  # Add your OpenWeatherMap API key here
+  location: "Volos,Greece"
+  update_interval: 3600  # Seconds (1 hour)
+
+# Notification settings
+notifications:
+  telegram:
+    enabled: true
+    token: ""  # Add your Telegram bot token here
+    chat_id: ""  # Add your Telegram chat ID here
+    notify_on:
+      watering: true
+      low_moisture: true
+      high_temperature: true
+      errors: true
+
+# Data storage
+data:
+  storage_path: "./data"  # Path to store sensor data
+  max_history: 7  # Days to keep sensor data
