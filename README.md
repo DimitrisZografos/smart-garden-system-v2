@@ -1,94 +1,133 @@
-# Smart Garden System
+# Smart Garden System - University Project
 
-An intelligent watering and plant monitoring system powered by Raspberry Pi and machine learning.
+A simplified smart garden monitoring and watering system designed for educational purposes. This project simulates a complete garden monitoring system with sensors, actuators, and a web interface.
 
-## Features
+## Overview
 
-- **Automated Watering**: Smart watering based on soil moisture, weather forecast, and plant needs
-- **Environmental Monitoring**: Track soil moisture, temperature, humidity, and atmospheric pressure
-- **Plant Health Analysis**: Camera-based monitoring with ML for growth tracking and disease detection
-- **Weather Integration**: Adjusts watering schedule based on weather forecasts
-- **Data Visualization**: Monitor your garden's health through an intuitive dashboard
-- **Remote Control**: Manage your garden from anywhere
-- **Telegram Notifications**: Get alerts and status updates via Telegram
+This project provides a simulated smart garden system that includes:
 
-## Hardware Components
+- Soil moisture monitoring
+- Environmental monitoring (temperature, humidity, pressure)
+- Automated watering system
+- Plant image capture
+- Weather forecast integration
+- Web interface for monitoring and control
 
-- Raspberry Pi (3B+ or 4)
-- Soil Moisture Sensor
-- BME280 Sensor (Temperature, Humidity, Pressure)
-- Raspberry Pi Camera Module
-- Water Pump/Solenoid Valve
-- Relay Module
+The system is designed to run on a Raspberry Pi, but operates in simulation mode for educational purposes.
 
-## Software Architecture
+## Components
 
-- Python backend for sensor integration and control logic
-- SQLite/PostgreSQL database for data storage
-- TensorFlow/PyTorch for plant analysis ML models
-- Flask web interface with interactive dashboard
-- OpenWeatherMap API integration
-- Telegram notifications
+- **Sensors**: Simulated soil moisture and environmental sensors
+- **Actuators**: Simulated watering system
+- **Camera**: Simulated plant image capture
+- **Weather**: Integration with weather forecast APIs
+- **Web Interface**: Browser-based dashboard and control panel
+
+## Directory Structure
+
+```
+smart-garden-university-project/
+├── config/               # Configuration files
+├── data/                 # Data storage (images, sensor readings)
+├── sensors.py            # Sensor management
+├── actuators.py          # Watering system control
+├── weather.py            # Weather forecast integration
+├── main.py               # Main program
+├── web_app/              # Web interface
+│   ├── app.py            # Flask application
+│   ├── templates/        # HTML templates
+│   └── static/           # Static files (CSS, JS, images)
+├── requirements.txt      # Python dependencies
+└── README.md             # This file
+```
 
 ## Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/DimitrisZografos/smart-garden-system.git
-cd smart-garden-system
+1. Clone this repository to your Raspberry Pi or development machine:
+   ```
+   git clone https://github.com/yourusername/smart-garden-university-project.git
+   cd smart-garden-university-project
+   ```
 
-# Install dependencies
-pip install -r requirements.txt
+2. Install the required dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
 
-# Install hardware-specific libraries
-pip install RPi.GPIO adafruit-circuitpython-bme280 picamera
+3. Create a configuration file:
+   ```
+   mkdir -p config
+   cp config/config.yaml.example config/config.yaml
+   ```
 
-# Configure your system
-python src/setup.py
+4. Edit the configuration file to match your preferences:
+   ```
+   nano config/config.yaml
+   ```
 
-# Edit config.yaml with your specific settings
-# - Set API keys for weather services
-# - Configure GPIO pins for your hardware setup
-# - Set up Telegram notification settings
+## Usage
 
-# Run the system
-python run.py
+### Running the Main System
+
+To start the main garden monitoring system:
+
+```
+python main.py
 ```
 
-## Configuration
+This will start the sensor monitoring, automated watering, and other core functions.
 
-Edit the `config.yaml` file to set up your:
-- Hardware pins
-- Watering thresholds
-- Weather API credentials
-- Database settings
-- Telegram notification settings
+### Running the Web Interface
 
-## Required Sensitive Information
+To start the web interface:
 
-You'll need to provide the following sensitive information in your `config.yaml` file:
+```
+cd web_app
+python app.py
+```
 
-1. **Weather API Key**: 
-   - Sign up for an API key from OpenWeatherMap
-   - Add your key to `weather_api.api_key` in config.yaml
-   - Location is already set to Volos, Greece
+Then access the web interface by opening a browser and navigating to:
+```
+http://<raspberry-pi-ip-address>:5000
+```
 
-2. **Telegram Bot Token and Chat ID**:
-   - Create a Telegram bot using BotFather
-   - Add your bot token to `notifications.telegram.bot_token`
-   - Add your chat ID to `notifications.telegram.chat_id`
+Where `<raspberry-pi-ip-address>` is the IP address of your Raspberry Pi on your local network.
 
-3. **Database Credentials** (if using PostgreSQL):
-   - Set `database.user` and `database.password`
+## Web Interface
 
-4. **Hardware Configuration**:
-   - Verify GPIO pin assignments match your physical connections
-   - Adjust sensor calibration values as needed
+The web interface provides:
 
-## Contributing
+- **Dashboard**: Real-time sensor readings and system status
+- **History**: Historical data visualization with charts
+- **Images**: Gallery of plant images captured by the camera
+- **Settings**: System configuration options
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+You can access the web interface from any device on your local network by entering the Raspberry Pi's IP address and port 5000 in a web browser.
+
+## Simulation Mode
+
+This project operates in simulation mode, meaning:
+
+- No actual hardware is required
+- Sensor readings are simulated with realistic values
+- Watering actions are simulated (no actual water pump control)
+- Camera captures are simulated (sample images are used)
+
+This makes it ideal for educational purposes and development without requiring physical hardware.
+
+## Customization
+
+You can customize the system by:
+
+1. Modifying the configuration file (`config/config.yaml`)
+2. Adjusting the simulation parameters in the code
+3. Extending the functionality with new features
+4. Customizing the web interface
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is provided for educational purposes. Feel free to use and modify it for your university projects.
+
+## Acknowledgments
+
+This project is a simplified version of a complete smart garden system, designed specifically for university coursework and educational purposes.
