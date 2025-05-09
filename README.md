@@ -1,6 +1,6 @@
 # Smart Garden System - University Project
 
-A simplified smart garden monitoring and watering system designed for educational purposes. This project simulates a complete garden monitoring system with sensors, actuators, and a web interface.
+A simplified smart garden monitoring and watering system designed for educational purposes. This project simulates a garden monitoring system with a single-page web interface.
 
 ## Overview
 
@@ -11,17 +11,9 @@ This project provides a simulated smart garden system that includes:
 - Automated watering system
 - Plant image capture
 - Weather forecast integration
-- Web interface for monitoring and control
+- Single-page web interface for monitoring and control
 
 The system is designed to run on a Raspberry Pi, but operates in simulation mode for educational purposes.
-
-## Components
-
-- **Sensors**: Simulated soil moisture and environmental sensors
-- **Actuators**: Simulated watering system
-- **Camera**: Simulated plant image capture
-- **Weather**: Integration with weather forecast APIs
-- **Web Interface**: Browser-based dashboard and control panel
 
 ## Directory Structure
 
@@ -29,105 +21,69 @@ The system is designed to run on a Raspberry Pi, but operates in simulation mode
 smart-garden-university-project/
 ├── config/               # Configuration files
 ├── data/                 # Data storage (images, sensor readings)
-├── sensors.py            # Sensor management
-├── actuators.py          # Watering system control
-├── weather.py            # Weather forecast integration
-├── main.py               # Main program
 ├── web_app/              # Web interface
-│   ├── app.py            # Flask application
-│   ├── templates/        # HTML templates
-│   └── static/           # Static files (CSS, JS, images)
+│   ├── app.py            # Flask application with all functionality
+│   ├── templates/        # Single HTML template
+│   └── static/           # Static files (CSS, JS)
 ├── requirements.txt      # Python dependencies
+├── run.sh                # Startup script
 └── README.md             # This file
 ```
 
 ## Installation
 
-1. Clone this repository to your Raspberry Pi or development machine:
+1. Clone this repository to your Raspberry Pi:
    ```
    git clone https://github.com/yourusername/smart-garden-university-project.git
    cd smart-garden-university-project
    ```
 
-2. Install the required dependencies:
+2. Run the startup script:
    ```
-   pip install -r requirements.txt
-   ```
-
-3. Create a configuration file:
-   ```
-   mkdir -p config
-   cp config/config.yaml.example config/config.yaml
+   chmod +x run.sh
+   ./run.sh
    ```
 
-4. Edit the configuration file to match your preferences:
-   ```
-   nano config/config.yaml
-   ```
-
-## Usage
-
-### Running the Main System
-
-To start the main garden monitoring system:
-
-```
-python main.py
-```
-
-This will start the sensor monitoring, automated watering, and other core functions.
-
-### Running the Web Interface
-
-To start the web interface:
-
-```
-cd web_app
-python app.py
-```
-
-Then access the web interface by opening a browser and navigating to:
-```
-http://<raspberry-pi-ip-address>:5000
-```
-
-Where `<raspberry-pi-ip-address>` is the IP address of your Raspberry Pi on your local network.
+The script will:
+- Create necessary directories
+- Set up a default configuration
+- Install required dependencies
+- Start the web interface
 
 ## Web Interface
 
-The web interface provides:
+The web interface provides all functionality in a single page with tabs:
 
 - **Dashboard**: Real-time sensor readings and system status
 - **History**: Historical data visualization with charts
 - **Images**: Gallery of plant images captured by the camera
 - **Settings**: System configuration options
 
-You can access the web interface from any device on your local network by entering the Raspberry Pi's IP address and port 5000 in a web browser.
+Access the web interface from any device on your local network:
+```
+http://<raspberry-pi-ip-address>:5000
+```
 
-## Simulation Mode
+Where `<raspberry-pi-ip-address>` is the IP address of your Raspberry Pi.
 
-This project operates in simulation mode, meaning:
+## Features
 
-- No actual hardware is required
-- Sensor readings are simulated with realistic values
-- Watering actions are simulated (no actual water pump control)
-- Camera captures are simulated (sample images are used)
-
-This makes it ideal for educational purposes and development without requiring physical hardware.
+- **All-in-one design**: All functionality is contained in a single Python file and a single HTML page
+- **Simulation mode**: No physical hardware required
+- **Responsive interface**: Works on desktop and mobile devices
+- **Real-time updates**: Sensor data refreshes automatically
+- **Historical data**: Track changes over time
+- **Image gallery**: View all captured plant images
+- **Simple configuration**: Easy to customize settings
 
 ## Customization
 
 You can customize the system by:
 
-1. Modifying the configuration file (`config/config.yaml`)
-2. Adjusting the simulation parameters in the code
-3. Extending the functionality with new features
-4. Customizing the web interface
+1. Editing the configuration file (`config/config.yaml`)
+2. Modifying the web interface HTML (`web_app/templates/dashboard.html`)
+3. Adjusting the simulation parameters in the app.py file
 
 ## License
 
 This project is provided for educational purposes. Feel free to use and modify it for your university projects.
-
-## Acknowledgments
-
-This project is a simplified version of a complete smart garden system, designed specifically for university coursework and educational purposes.
