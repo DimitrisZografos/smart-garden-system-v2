@@ -1,0 +1,136 @@
+{% extends "layout.html" %}
+
+{% block title %}Plant Images - Smart Garden System{% endblock %}
+
+{% block head %}
+<style>
+    .image-card {
+        margin-bottom: 20px;
+    }
+    .image-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    .image-card .card-footer {
+        font-size: 0.9rem;
+    }
+    .modal-image {
+        max-width: 100%;
+        max-height: 80vh;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Plant Images Gallery</h5>
+            </div>
+            <div class="card-body">
+                <div class="row" id="image-gallery">
+                    <div class="col-12 text-center">
+                        <p>Loading images...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Plant Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="" id="modal-image" class="modal-image">
+                <p id="modal-date" class="mt-2"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load images
+        loadImages();
+        
+        // Set up auto-refresh
+        setInterval(loadImages, 60000); // Refresh every minute
+    });
+    
+    function loadImages() {
+        fetch('/api/images')
+            .then(response => response.json())
+            .then(images => {
+                if (images.length > 0) {
+                    const gallery = document.getElementById('image-gallery');
+                    gallery.innerHTML = '';
+                    
+                    images.forEach(image => {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-4';
+                        col.innerHTML = `
+                            <div class="card image-card">
+                                <img src="${image.url}" class="card-img-top" alt="Plant image">
+                                <div class="card-body">
+                                    <h5 class="card-title">${image.filename}</h5>
+                                </div>
+                                <div class="card-footer text-muted">
+                                    Captured: ${image.date}
+                                </div>
+                                <div class="card-footer">
+                                    <button class="btn btn-primary btn-sm view-image" 
+                                            data-url="${image.url}" 
+                                            data-date="${image.date}">
+                                        View Full Size
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        gallery.appendChild(col);
+                    });
+                    
+                    // Set up image modal triggers
+                    document.querySelectorAll('.view-image').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const url = this.getAttribute('data-url');
+                            const date = this.getAttribute('data-date');
+                            
+                            document.getElementById('modal-image').src = url;
+                            document.getElementById('modal-date').textContent = 'Captured: ' + date;
+                            
+                            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+                            modal.show();
+                        });
+                    });
+                } else {
+                    document.getElementById('image-gallery').innerHTML = `
+                        <div class="col-12 text-center">
+                            <p>No images available yet. Images will appear here once the camera captures them.</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading images:', error);
+                document.getElementById('image-gallery').innerHTML = `
+                    <div class="col-12 text-center">
+                        <p>Error loading images. Please try again later.</p>
+                    </div>
+                `;
+            });
+    }
+</script>
+{% endblock %}

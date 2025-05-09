@@ -1,0 +1,308 @@
+{% extends "layout.html" %}
+
+{% block title %}History - Smart Garden System{% endblock %}
+
+{% block head %}
+<style>
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Sensor History</h5>
+            </div>
+            <div class="card-body">
+                <div class="btn-group mb-3" role="group">
+                    <button type="button" class="btn btn-outline-primary active" id="btn-day">Last 24 Hours</button>
+                    <button type="button" class="btn btn-outline-primary" id="btn-week">Last Week</button>
+                    <button type="button" class="btn btn-outline-primary" id="btn-month">Last Month</button>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="moisture-chart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="temperature-chart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="humidity-chart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="pressure-chart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Watering History</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date/Time</th>
+                                <th>Duration</th>
+                                <th>Trigger</th>
+                                <th>Soil Moisture Before</th>
+                                <th>Soil Moisture After</th>
+                            </tr>
+                        </thead>
+                        <tbody id="watering-history">
+                            <tr>
+                                <td colspan="5" class="text-center">Loading watering history...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Chart objects
+    let moistureChart, temperatureChart, humidityChart, pressureChart;
+    let historyData = [];
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load history data
+        loadHistoryData();
+        
+        // Set up time period buttons
+        document.getElementById('btn-day').addEventListener('click', function() {
+            setActiveButton(this);
+            updateCharts('day');
+        });
+        
+        document.getElementById('btn-week').addEventListener('click', function() {
+            setActiveButton(this);
+            updateCharts('week');
+        });
+        
+        document.getElementById('btn-month').addEventListener('click', function() {
+            setActiveButton(this);
+            updateCharts('month');
+        });
+    });
+    
+    function setActiveButton(button) {
+        // Remove active class from all buttons
+        document.querySelectorAll('.btn-group .btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Add active class to clicked button
+        button.classList.add('active');
+    }
+    
+    function loadHistoryData() {
+        // In a real implementation, this would load from the server
+        // For now, we'll use the history data passed from the template
+        historyData = {{ history|tojson }};
+        
+        // Initialize charts with day view
+        initCharts();
+        updateCharts('day');
+        
+        // Update watering history table
+        updateWateringHistory();
+    }
+    
+    function initCharts() {
+        // Initialize moisture chart
+        const moistureCtx = document.getElementById('moisture-chart').getContext('2d');
+        moistureChart = new Chart(moistureCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Soil Moisture (%)',
+                    data: [],
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: getChartOptions('Soil Moisture (%)')
+        });
+        
+        // Initialize temperature chart
+        const temperatureCtx = document.getElementById('temperature-chart').getContext('2d');
+        temperatureChart = new Chart(temperatureCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Temperature (°C)',
+                    data: [],
+                    borderColor: 'rgba(220, 53, 69, 1)',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: getChartOptions('Temperature (°C)')
+        });
+        
+        // Initialize humidity chart
+        const humidityCtx = document.getElementById('humidity-chart').getContext('2d');
+        humidityChart = new Chart(humidityCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Humidity (%)',
+                    data: [],
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: getChartOptions('Humidity (%)')
+        });
+        
+        // Initialize pressure chart
+        const pressureCtx = document.getElementById('pressure-chart').getContext('2d');
+        pressureChart = new Chart(pressureCtx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Pressure (hPa)',
+                    data: [],
+                    borderColor: 'rgba(255, 193, 7, 1)',
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: getChartOptions('Pressure (hPa)')
+        });
+    }
+    
+    function getChartOptions(title) {
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: title,
+                    font: {
+                        size: 16
+                    }
+                },
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: false
+                }
+            }
+        };
+    }
+    
+    function updateCharts(period) {
+        // Filter data based on selected time period
+        const now = new Date();
+        let filteredData = [];
+        
+        switch(period) {
+            case 'day':
+                // Last 24 hours
+                const oneDayAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
+                filteredData = historyData.filter(item => new Date(item.timestamp) >= oneDayAgo);
+                break;
+            case 'week':
+                // Last 7 days
+                const oneWeekAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+                filteredData = historyData.filter(item => new Date(item.timestamp) >= oneWeekAgo);
+                break;
+            case 'month':
+                // Last 30 days
+                const oneMonthAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+                filteredData = historyData.filter(item => new Date(item.timestamp) >= oneMonthAgo);
+                break;
+        }
+        
+        // Extract data for charts
+        const labels = filteredData.map(item => {
+            const date = new Date(item.timestamp);
+            return date.toLocaleString();
+        });
+        
+        const moistureData = filteredData.map(item => item.soil_moisture);
+        const temperatureData = filteredData.map(item => item.temperature);
+        const humidityData = filteredData.map(item => item.humidity);
+        const pressureData = filteredData.map(item => item.pressure);
+        
+        // Update charts
+        updateChart(moistureChart, labels, moistureData);
+        updateChart(temperatureChart, labels, temperatureData);
+        updateChart(humidityChart, labels, humidityData);
+        updateChart(pressureChart, labels, pressureData);
+    }
+    
+    function updateChart(chart, labels, data) {
+        chart.data.labels = labels;
+        chart.data.datasets[0].data = data;
+        chart.update();
+    }
+    
+    function updateWateringHistory() {
+        // This would normally come from a separate API endpoint
+        // For now, we'll just show a placeholder
+        document.getElementById('watering-history').innerHTML = `
+            <tr>
+                <td>2025-05-08 10:30:15</td>
+                <td>15 seconds</td>
+                <td>Automatic (Low Moisture)</td>
+                <td>25%</td>
+                <td>65%</td>
+            </tr>
+            <tr>
+                <td>2025-05-07 14:22:45</td>
+                <td>10 seconds</td>
+                <td>Manual</td>
+                <td>40%</td>
+                <td>75%</td>
+            </tr>
+            <tr>
+                <td>2025-05-06 09:15:30</td>
+                <td>20 seconds</td>
+                <td>Automatic (Low Moisture)</td>
+                <td>20%</td>
+                <td>70%</td>
+            </tr>
+        `;
+    }
+</script>
+{% endblock %}

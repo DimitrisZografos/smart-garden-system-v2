@@ -1,0 +1,29 @@
+# Smart Garden System Configuration
+
+# Watering settings
+watering:
+  moisture_threshold: 30  # Water when moisture is below this percentage
+  duration: 10            # Default watering duration in seconds
+  cooldown: 60            # Minimum time between watering cycles in minutes
+  auto_watering: true     # Enable automatic watering
+
+# Sensor settings
+sensors:
+  reading_interval: 15    # Sensor reading interval in minutes
+
+# Camera settings
+camera:
+  enabled: true           # Enable camera
+  interval: 6             # Hours between image captures
+  resolution: "medium"    # low, medium, high
+
+# Weather settings
+weather:
+  api_key: ""             # OpenWeatherMap API key
+  location: "London"      # Location for weather forecast
+
+# Notification settings
+notifications:
+  enabled: false          # Enable notifications
+  telegram_token: ""      # Telegram bot token
+  telegram_chat_id: ""    # Telegram chat ID
