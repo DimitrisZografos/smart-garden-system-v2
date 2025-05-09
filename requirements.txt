@@ -1,0 +1,22 @@
+# Smart Garden System Requirements
+
+# Core dependencies
+PyYAML>=6.0
+requests>=2.28.1
+schedule>=1.2.0
+
+# Hardware interfaces (simulation mode available)
+RPi.GPIO>=0.7.0; platform_machine == 'armv7l'
+picamera>=1.13; platform_machine == 'armv7l'
+adafruit-circuitpython-dht>=3.7.0; platform_machine == 'armv7l'
+adafruit-circuitpython-ads1x15>=2.4.0; platform_machine == 'armv7l'
+
+# Web interface
+Flask>=3.0.0
+Werkzeug>=3.0.0
+Jinja2>=3.0.0
+itsdangerous>=2.0.0
+click>=8.0.0
+
+# Optional: for image processing
+Pillow>=9.0.0
