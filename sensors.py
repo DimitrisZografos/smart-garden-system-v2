@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 """
-Smart Garden System - Sensor Module
-This module handles all sensor interactions for the Smart Garden System.
-It provides a unified interface for reading soil moisture, temperature,
-humidity, pressure, and capturing images.
-
-In simulation mode, it generates realistic random values instead of
-reading from actual hardware.
+Smart Garden System - Sensor Module for Raspberry Pi 4 with:
+- KeyStudio 0100611 Soil Moisture Sensor via ADS1015 ADC
+- DHT20 Temperature and Humidity Sensor
+- Raspberry Pi Camera Module 3
 """
 
 import os
@@ -17,10 +14,7 @@ from PIL import Image, ImageDraw, ImageFont
 import logging
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('sensors')
 
 # Constants
@@ -32,12 +26,7 @@ class SensorManager:
     """Manages all sensors for the Smart Garden System"""
     
     def __init__(self, simulate=False):
-        """
-        Initialize the sensor manager
-        
-        Args:
-            simulate (bool): If True, use simulated values instead of real hardware
-        """
+        """Initialize the sensor manager"""
         self.simulate = simulate
         logger.info(f"Initializing SensorManager (Simulation: {simulate})")
         
@@ -47,37 +36,52 @@ class SensorManager:
                 # Try to import hardware-specific libraries
                 import RPi.GPIO as GPIO
                 import board
-                import adafruit_dht
-                import adafruit_ads1x15.ads1115 as ADS
-                from adafruit_ads1x15.analog_in import AnalogIn
                 import busio
                 
-                # Set up soil moisture sensor (ADS1115 ADC)
+                # Import ADS1015 libraries for soil moisture sensor
+                import adafruit_ads1x15.ads1015 as ADS
+                from adafruit_ads1x15.analog_in import AnalogIn
+                
+                # Import DHT20 library
+                import adafruit_ahtx0
+                
+                # Set up I2C bus
                 i2c = busio.I2C(board.SCL, board.SDA)
-                self.ads = ADS.ADS1115(i2c)
+                
+                # Set up ADS1015 for soil moisture sensor
+                self.ads = ADS.ADS1015(i2c)
                 self.soil_channel = AnalogIn(self.ads, ADS.P0)
                 
-                # Set up DHT22 temperature/humidity sensor
-                self.dht = adafruit_dht.DHT22(board.D4)
+                # Set up DHT20 temperature/humidity sensor
+                self.dht = adafruit_ahtx0.AHTx0(i2c)
                 
                 # Set up camera
                 try:
-                    from picamera import PiCamera
-                    self.camera = PiCamera()
-                    self.camera.resolution = (1024, 768)
-                    self.camera.rotation = 180  # Adjust based on camera orientation
+                    # Using picamera2 for Raspberry Pi Camera Module 3
+                    from picamera2 import Picamera2
+                    self.camera = Picamera2()
+                    self.camera.configure(self.camera.create_still_configuration(main={"size": (1920, 1080)}))
+                    self.camera.start()
                     time.sleep(2)  # Allow camera to initialize
-                    logger.info("Camera initialized")
+                    logger.info("Camera Module 3 initialized")
                 except ImportError:
-                    logger.warning("PiCamera module not available, camera functionality disabled")
-                    self.camera = None
+                    logger.warning("Picamera2 module not available, falling back to legacy PiCamera")
+                    try:
+                        from picamera import PiCamera
+                        self.camera = PiCamera()
+                        self.camera.resolution = (1920, 1080)
+                        time.sleep(2)  # Allow camera to initialize
+                        logger.info("Legacy PiCamera initialized")
+                    except ImportError:
+                        logger.warning("Camera modules not available, camera functionality disabled")
+                        self.camera = None
                 except Exception as e:
                     logger.error(f"Error initializing camera: {e}")
                     self.camera = None
                 
-                logger.info("Hardware sensors initialized")
-            except ImportError:
-                logger.warning("Hardware libraries not available, falling back to simulation mode")
+                logger.info("Hardware sensors initialized successfully")
+            except ImportError as e:
+                logger.warning(f"Hardware libraries not available: {e}, falling back to simulation mode")
                 self.simulate = True
             except Exception as e:
                 logger.error(f"Error initializing hardware: {e}")
@@ -92,12 +96,7 @@ class SensorManager:
             logger.info("Simulation mode initialized with random starting values")
     
     def read_soil_moisture(self):
-        """
-        Read soil moisture level
-        
-        Returns:
-            float: Soil moisture percentage (0-100%)
-        """
+        """Read soil moisture level from KeyStudio 0100611 sensor via ADS1015"""
         if self.simulate:
             # Simulate slow changes in soil moisture
             change = random.uniform(-2, -0.5)  # Soil tends to dry out
@@ -109,15 +108,15 @@ class SensorManager:
             return round(self.sim_moisture, 1)
         
         try:
-            # Read from ADS1115 ADC
+            # Read from ADS1015 ADC
             raw_value = self.soil_channel.value
             # Convert to percentage (adjust min/max based on calibration)
-            # These values should be calibrated for your specific sensor
+            # These values should be calibrated for your specific KeyStudio sensor
             min_moisture = 26000  # Value when sensor is in dry soil
-            max_moisture = 10000  # Value when sensor is in water
+            max_moisture = 12000  # Value when sensor is in water
             moisture_percentage = 100 - ((raw_value - max_moisture) * 100 / (min_moisture - max_moisture))
             moisture_percentage = max(0, min(100, moisture_percentage))
-            logger.info(f"Soil moisture: {moisture_percentage:.1f}%")
+            logger.info(f"Soil moisture: {moisture_percentage:.1f}% (raw: {raw_value})")
             return round(moisture_percentage, 1)
         except Exception as e:
             logger.error(f"Error reading soil moisture: {e}")
@@ -125,15 +124,7 @@ class SensorManager:
             return round(random.uniform(20, 80), 1)
     
     def read_environmental_data(self):
-        """
-        Read temperature, humidity and pressure
-        
-        Returns:
-            tuple: (temperature, humidity, pressure)
-                temperature: in Celsius
-                humidity: relative humidity in percentage
-                pressure: atmospheric pressure in hPa
-        """
+        """Read temperature, humidity from DHT20 sensor"""
         if self.simulate:
             # Simulate small changes in environmental conditions
             temp_change = random.uniform(-0.5, 0.5)
@@ -154,12 +145,11 @@ class SensorManager:
             return (round(self.sim_temp, 1), round(self.sim_humidity, 1), round(self.sim_pressure, 1))
         
         try:
-            # Read from DHT22 sensor
+            # Read from DHT20 sensor
             temperature = self.dht.temperature
-            humidity = self.dht.humidity
+            humidity = self.dht.relative_humidity
             
-            # For pressure, we would normally read from a BMP280 or similar
-            # Since we don't have that in our basic setup, we'll simulate it
+            # DHT20 doesn't provide pressure, so we'll simulate it
             pressure = random.uniform(1000, 1020)
             
             logger.info(f"Environmental data: {temperature:.1f}°C, {humidity:.1f}%, {pressure:.1f}hPa")
@@ -174,12 +164,7 @@ class SensorManager:
             )
     
     def capture_image(self):
-        """
-        Capture an image from the camera
-        
-        Returns:
-            str: Path to the saved image, or None if capture failed
-        """
+        """Capture an image from the Raspberry Pi Camera Module 3"""
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         image_path = os.path.join(DATA_DIR, f"plant_{timestamp}.jpg")
         
@@ -187,7 +172,7 @@ class SensorManager:
             # Create a simulated plant image
             try:
                 # Create a simple image with text
-                img = Image.new('RGB', (1024, 768), color=(34, 139, 34))  # Green background
+                img = Image.new('RGB', (1920, 1080), color=(34, 139, 34))  # Green background
                 draw = ImageDraw.Draw(img)
                 
                 # Try to use a font if available
@@ -223,9 +208,16 @@ class SensorManager:
                 return None
         
         # Real camera capture
-        if hasattr(self, 'camera') and self.camera:
+        if hasattr(self, 'camera'):
             try:
-                self.camera.capture(image_path)
+                # Check if we're using picamera2 or legacy picamera
+                if hasattr(self.camera, 'capture_file'):  # Picamera2
+                    self.camera.capture_file(image_path)
+                elif hasattr(self.camera, 'capture'):  # Legacy PiCamera
+                    self.camera.capture(image_path)
+                else:
+                    raise Exception("Unknown camera type")
+                    
                 logger.info(f"Image captured and saved to {image_path}")
                 return image_path
             except Exception as e:
