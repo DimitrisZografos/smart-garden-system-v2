@@ -1,94 +1,89 @@
-# Smart Garden System
+# Smart Garden System - University Project
 
-An intelligent watering and plant monitoring system powered by Raspberry Pi and machine learning.
+A simplified smart garden monitoring and watering system designed for educational purposes. This project simulates a garden monitoring system with a single-page web interface.
 
-## Features
+## Overview
 
-- **Automated Watering**: Smart watering based on soil moisture, weather forecast, and plant needs
-- **Environmental Monitoring**: Track soil moisture, temperature, humidity, and atmospheric pressure
-- **Plant Health Analysis**: Camera-based monitoring with ML for growth tracking and disease detection
-- **Weather Integration**: Adjusts watering schedule based on weather forecasts
-- **Data Visualization**: Monitor your garden's health through an intuitive dashboard
-- **Remote Control**: Manage your garden from anywhere
-- **Telegram Notifications**: Get alerts and status updates via Telegram
+This project provides a simulated smart garden system that includes:
 
-## Hardware Components
+- Soil moisture monitoring
+- Environmental monitoring (temperature, humidity, pressure)
+- Automated watering system
+- Plant image capture
+- Weather forecast integration
+- Single-page web interface for monitoring and control
 
-- Raspberry Pi (3B+ or 4)
-- Soil Moisture Sensor
-- BME280 Sensor (Temperature, Humidity, Pressure)
-- Raspberry Pi Camera Module
-- Water Pump/Solenoid Valve
-- Relay Module
+The system is designed to run on a Raspberry Pi, but operates in simulation mode for educational purposes.
 
-## Software Architecture
+## Directory Structure
 
-- Python backend for sensor integration and control logic
-- SQLite/PostgreSQL database for data storage
-- TensorFlow/PyTorch for plant analysis ML models
-- Flask web interface with interactive dashboard
-- OpenWeatherMap API integration
-- Telegram notifications
+```
+smart-garden-university-project/
+├── config/               # Configuration files
+├── data/                 # Data storage (images, sensor readings)
+├── web_app/              # Web interface
+│   ├── app.py            # Flask application with all functionality
+│   ├── templates/        # Single HTML template
+│   └── static/           # Static files (CSS, JS)
+├── requirements.txt      # Python dependencies
+├── run.sh                # Startup script
+└── README.md             # This file
+```
 
 ## Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/DimitrisZografos/smart-garden-system.git
-cd smart-garden-system
+1. Clone this repository to your Raspberry Pi:
+   ```
+   git clone https://github.com/yourusername/smart-garden-university-project.git
+   cd smart-garden-university-project
+   ```
 
-# Install dependencies
-pip install -r requirements.txt
+2. Run the startup script:
+   ```
+   chmod +x run.sh
+   ./run.sh
+   ```
 
-# Install hardware-specific libraries
-pip install RPi.GPIO adafruit-circuitpython-bme280 picamera
+The script will:
+- Create necessary directories
+- Set up a default configuration
+- Install required dependencies
+- Start the web interface
 
-# Configure your system
-python src/setup.py
+## Web Interface
 
-# Edit config.yaml with your specific settings
-# - Set API keys for weather services
-# - Configure GPIO pins for your hardware setup
-# - Set up Telegram notification settings
+The web interface provides all functionality in a single page with tabs:
 
-# Run the system
-python run.py
+- **Dashboard**: Real-time sensor readings and system status
+- **History**: Historical data visualization with charts
+- **Images**: Gallery of plant images captured by the camera
+- **Settings**: System configuration options
+
+Access the web interface from any device on your local network:
+```
+http://<raspberry-pi-ip-address>:5000
 ```
 
-## Configuration
+Where `<raspberry-pi-ip-address>` is the IP address of your Raspberry Pi.
 
-Edit the `config.yaml` file to set up your:
-- Hardware pins
-- Watering thresholds
-- Weather API credentials
-- Database settings
-- Telegram notification settings
+## Features
 
-## Required Sensitive Information
+- **All-in-one design**: All functionality is contained in a single Python file and a single HTML page
+- **Simulation mode**: No physical hardware required
+- **Responsive interface**: Works on desktop and mobile devices
+- **Real-time updates**: Sensor data refreshes automatically
+- **Historical data**: Track changes over time
+- **Image gallery**: View all captured plant images
+- **Simple configuration**: Easy to customize settings
 
-You'll need to provide the following sensitive information in your `config.yaml` file:
+## Customization
 
-1. **Weather API Key**: 
-   - Sign up for an API key from OpenWeatherMap
-   - Add your key to `weather_api.api_key` in config.yaml
-   - Location is already set to Volos, Greece
+You can customize the system by:
 
-2. **Telegram Bot Token and Chat ID**:
-   - Create a Telegram bot using BotFather
-   - Add your bot token to `notifications.telegram.bot_token`
-   - Add your chat ID to `notifications.telegram.chat_id`
-
-3. **Database Credentials** (if using PostgreSQL):
-   - Set `database.user` and `database.password`
-
-4. **Hardware Configuration**:
-   - Verify GPIO pin assignments match your physical connections
-   - Adjust sensor calibration values as needed
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+1. Editing the configuration file (`config/config.yaml`)
+2. Modifying the web interface HTML (`web_app/templates/dashboard.html`)
+3. Adjusting the simulation parameters in the app.py file
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is provided for educational purposes. Feel free to use and modify it for your university projects.
